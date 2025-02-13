@@ -58,14 +58,42 @@ plt.show()
 stat, p_val, fig = test_normality(mbp_abb_4dpf, 1)
 plt.show()
 
+#Seperate conditions
+def cond_types(data, condition, column):
+    data_condition = data[data[column] == condition]
+    return data_condition
 
+#example usage
+DMSO_4dpf = cond_types(mbp_abb_4dpf, 'DMSO', 'Condition')
+win05_4dpf = cond_types(mbp_abb_4dpf, 0.5, 'Condition')
+win1_4dpf = cond_types(mbp_abb_4dpf, 1, 'Condition')
 
-# palette=["#1768AC", "#F72585", "#420039"]
+#plot 4 and 5 dpf together 
 
+fig, (ax1, ax2) = plt.subplots(1,2, sharey=True)
 # plot 4 dpf data 
 sns.swarmplot(data = mbp_abb_4dpf, x = 'Condition',
               y = 'abberant_count', hue = 'Condition',
               palette = ["#1768AC", "#F72585", "#420039"],
-                )
+              ax= ax1)
+sns.boxplot(data = mbp_abb_4dpf, x = 'Condition',
+           y = 'abberant_count', hue = 'Condition',
+           fill = False, widths = 0.25,
+           palette= ['black', 'black', 'black'],
+           legend=False, linewidth=0.75, ax = ax1)
+ax1.set_ylim(0,70)
+ax1.spines['top'].set_visible(False)
+ax1.spines['right'].set_visible(False)
+ax1.set_title('4 dpf')
 
+#plot 5 dpf data
+
+sns.swarmplot(data= mbp5dpf_abb,
+              palette = ["#1768AC", "#F72585", "#420039"], ax = ax2)
+sns.boxplot(data = mbp5dpf_abb, fill = False, widths = 0.25, 
+            palette= ['black', 'black', 'black'], linewidth=0.75, ax = ax2)
+ax2.set_ylim(0,70)
+ax2.spines['top'].set_visible(False)
+ax2.spines['right'].set_visible(False)
+ax2.set_title('5 dpf')
 
