@@ -63,10 +63,23 @@ def cond_types(data, condition, column):
     data_condition = data[data[column] == condition]
     return data_condition
 
-#example usage
+# Seperateing data by condition
 DMSO_4dpf = cond_types(mbp_abb_4dpf, 'DMSO', 'Condition')
 win05_4dpf = cond_types(mbp_abb_4dpf, 0.5, 'Condition')
 win1_4dpf = cond_types(mbp_abb_4dpf, 1, 'Condition')
+
+dmso_5dpf = mbp5dpf_abb['DMSO'].dropna()
+win05_5dpf = mbp5dpf_abb[0.5].dropna()
+win1_5dpf = mbp5dpf_abb[1].dropna()
+
+#means 
+dmso_mean = DMSO_4dpf['abberant_count'].mean()
+win05_mean = win05_4dpf['abberant_count'].mean()
+win1_mean = win1_4dpf['abberant_count'].mean()
+
+dmso_mean5 = dmso_5dpf['abberant_count'].mean()
+win05_mean5 = win05_5dpf['abberant_count'].mean()
+win1_mean5 = win1_5dpf['abberant_count'].mean()
 
 #plot 4 and 5 dpf together 
 
