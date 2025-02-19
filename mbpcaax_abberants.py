@@ -137,5 +137,5 @@ ax2.set_ylim(0,70)
 ax2.spines['top'].set_visible(False)
 ax2.spines['right'].set_visible(False)
 ax2.set_title('5 dpf')
+plt.savefig("/Users/miramota/Desktop/Figures/Figure1/abberrant_count4-5dpf.pdf", format='pdf')
 plt.show()
-
