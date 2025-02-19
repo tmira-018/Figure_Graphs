@@ -74,12 +74,20 @@ win1_5dpf = mbp5dpf_abb[1].dropna()
 
 #means 
 dmso_mean = DMSO_4dpf['abberant_count'].mean()
+dmso_rep = DMSO_4dpf.loc[DMSO_4dpf['abberant_count'] == 20]
+dmso_rep_value = dmso_rep['abberant_count'].iloc[0]
 win05_mean = win05_4dpf['abberant_count'].mean()
+win05_rep = win05_4dpf.loc[win05_4dpf['abberant_count'] == 19]
+win05_rep_value = win05_rep['abberant_count'].iloc[0]
 win1_mean = win1_4dpf['abberant_count'].mean()
+win1_rep = win1_4dpf.loc[win1_4dpf['abberant_count'] == 25]
 
-dmso_mean5 = dmso_5dpf['abberant_count'].mean()
-win05_mean5 = win05_5dpf['abberant_count'].mean()
-win1_mean5 = win1_5dpf['abberant_count'].mean()
+dmso_mean5 = dmso_5dpf.mean()
+dmso_rep5 = 15
+win05_mean5 = win05_5dpf.mean()
+win05_rep5 = 23
+win1_mean5 = win1_5dpf.mean()
+win1_rep5 = 32
 
 #plot 4 and 5 dpf together 
 
@@ -89,6 +97,17 @@ sns.swarmplot(data = mbp_abb_4dpf, x = 'Condition',
               y = 'abberant_count', hue = 'Condition',
               palette = ["#1768AC", "#F72585", "#420039"],
               ax= ax1)
+dmso_x_position = 0
+win05_xpos = 1
+win1_xpos = 2
+ax1.scatter(x = [dmso_x_position], y = [dmso_rep_value],
+            color = 'red', s = 75, marker = 'o', zorder = 2)
+ax1.scatter(x = [win05_xpos], y = [win05_rep_value],
+            color = 'black', s = 75, marker = 'o', zorder = 2)
+ax1.scatter(x = [win1_xpos], y = [25],
+            color = 'red', s = 75, marker = 'o', zorder = 2)
+
+
 sns.boxplot(data = mbp_abb_4dpf, x = 'Condition',
            y = 'abberant_count', hue = 'Condition',
            fill = False, widths = 0.25,
@@ -103,10 +122,20 @@ ax1.set_title('4 dpf')
 
 sns.swarmplot(data= mbp5dpf_abb,
               palette = ["#1768AC", "#F72585", "#420039"], ax = ax2)
+
+ax2.scatter(x = [0], y = [dmso_rep5], 
+            color = 'red', s = 75, marker = 'o', zorder = 2)
+ax2.scatter(x = [1], y = [win05_rep5],
+            color = 'black', s = 75, marker= 'o', zorder = 2)
+ax2.scatter(x = [2], y = [win1_rep5],
+            color = 'red', s = 75, marker = 'o', zorder = 2)
+
 sns.boxplot(data = mbp5dpf_abb, fill = False, widths = 0.25, 
             palette= ['black', 'black', 'black'], linewidth=0.75, ax = ax2)
+
 ax2.set_ylim(0,70)
 ax2.spines['top'].set_visible(False)
 ax2.spines['right'].set_visible(False)
 ax2.set_title('5 dpf')
+plt.show()
 
