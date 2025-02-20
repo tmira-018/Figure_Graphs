@@ -2,6 +2,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd 
 import numpy as np
+from scipy import stats
 
 # Import data
 nbt_df = pd.read_excel('/Users/miramota/OHSU Dropbox/Tania Miramontes/Data_sheets/combined_nbt_mbpnls_24.xlsx',
@@ -55,8 +56,14 @@ plot_nbt_mbp_aberrant(df = nbt_timeline)
 plt.savefig("/Users/miramota/Desktop/Figures/nbt_mbpnlscaax/abberant_timeline.pdf", format='pdf')
 plt.show()
 
-
 # Find average number of aberrant structures in 5 dpf fish
 nbt_5avg= nbt_timeline[nbt_timeline['dpf'] == 5]
 nbt_5avg.groupby('condition')['aberrant'].mean()
 nbt_5avg.groupby('condition')['aberrant'].median()
+
+
+
+
+
+
+
