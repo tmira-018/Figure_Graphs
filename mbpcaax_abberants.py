@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
 import statsmodels.api as sm
+import scikit_posthocs as sp
 
 #import and edit data
 #imports excel sheet with all the abberant counts
@@ -16,6 +17,7 @@ mbp_abb_4dpf = mbp4dpf_abb[pd.to_numeric(mbp4dpf_abb['abberant_count'], errors =
 
 mbp5dpf_abb = pd.read_excel('/Users/miramota/OHSU Dropbox/Tania Miramontes/Data_sheets/abberant_counts.xlsx',
                          sheet_name = '5dpf_combined')
+mbp5dpf_long = mbp5dpf_abb.melt(var_name="Drug", value_name="Response")
 
 #Check normality of data
 
@@ -65,12 +67,12 @@ def cond_types(data, condition, column):
 
 # Seperateing data by condition
 DMSO_4dpf = cond_types(mbp_abb_4dpf, 'DMSO', 'Condition')
+dmso_4_array = DMSO_4dpf['abberant_count'].to_numpy()
 win05_4dpf = cond_types(mbp_abb_4dpf, 0.5, 'Condition')
+win05_4_array = win05_4dpf['abberant_count'].to_numpy()
 win1_4dpf = cond_types(mbp_abb_4dpf, 1, 'Condition')
+win1_4_array = win1_4dpf['abberant_count'].to_numpy()
 
-dmso_5dpf = mbp5dpf_abb['DMSO'].dropna()
-win05_5dpf = mbp5dpf_abb[0.5].dropna()
-win1_5dpf = mbp5dpf_abb[1].dropna()
 
 #means 
 dmso_mean = DMSO_4dpf['abberant_count'].mean()
@@ -82,12 +84,32 @@ win05_rep_value = win05_rep['abberant_count'].iloc[0]
 win1_mean = win1_4dpf['abberant_count'].mean()
 win1_rep = win1_4dpf.loc[win1_4dpf['abberant_count'] == 25]
 
+dmso_5dpf = mbp5dpf_abb['DMSO'].to_numpy()
+dmso_5dpf = dmso_5dpf[~np.isnan(dmso_5dpf)]
 dmso_mean5 = dmso_5dpf.mean()
 dmso_rep5 = 15
+
+win05_5dpf = mbp5dpf_abb[0.5].to_numpy()
+win05_5dpf = win05_5dpf[~np.isnan(win05_5dpf)]
 win05_mean5 = win05_5dpf.mean()
 win05_rep5 = 23
+
+win1_5dpf = mbp5dpf_abb[1].to_numpy()
+win1_5dpf = win1_5dpf[~np.isnan(win1_5dpf)]
 win1_mean5 = win1_5dpf.mean()
 win1_rep5 = 32
+
+# Do Kruskal-Wallis test 4 dpf                                           
+H4 = stats.kruskal(dmso_4_array, win05_4_array, win1_4_array)
+print(H4)
+
+H5 = stats.kruskal(dmso_5dpf, win05_5dpf, win1_5dpf)
+print(H5)
+
+# Post-hoc test 5 dpf
+posthoc_results = sp.posthoc_dunn(mbp5dpf_long, val_col="Response", group_col="Drug", p_adjust="bonferroni")
+print(posthoc_results)
+
 
 #plot 4 and 5 dpf together 
 
