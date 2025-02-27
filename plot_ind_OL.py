@@ -38,7 +38,7 @@ def plot_ind_OL(df,analysis_type, title = 'title',
                 units='cell_ID',
                 estimator=None,
                 hue='cond',
-                palette=["#1768AC", "#F72585", "#420039"],
+                palette=["#1768AC", "#420039"],
                 legend=False,
                 alpha= 0.8,  # Make individual lines transparent
                 linewidth=.25)  # Thinner lines for individuals
@@ -50,7 +50,7 @@ def plot_ind_OL(df,analysis_type, title = 'title',
                  hue = 'cond',
                  err_style = 'bars',
                  err_kws={'capsize': 5, 'capthick': 2, 'elinewidth': 2},
-                 palette=["#1768AC", "#F72585", "#420039"],
+                 palette=["#1768AC", "#420039"],
                  errorbar=("se", 1))  
     
     #Customize the plot
@@ -98,13 +98,15 @@ def main():
     one_times = repeats[repeats == 1].index
     #keeps the cells that appear more than one time shape of ol_analysis plus one_times should equal shape of ol_df
     ol_analysis= ol_df[ol_df['cell_ID'].map(ol_df['cell_ID'].value_counts()) > 1]
+    #removes cells that were treated with 0.5 um WIN
+    ol_analysis2 = ol_analysis[ol_analysis.cond != 0.5]
 
     #Make fish id and cell id categorical for statistical analysis if needed
     fish_ID = ol_analysis["fish_ID"].astype("category")
     cell_ID = ol_analysis["cell_ID"].astype("category")
 
     # Usage: plotting OL measurement
-    plot_ind_OL(df = ol_analysis, analysis_type= analysis_type, 
+    plot_ind_OL(df = ol_analysis2, analysis_type= analysis_type, 
                     title = title, 
                     ylabel='N', xlabel='Age')
     plt.show()
