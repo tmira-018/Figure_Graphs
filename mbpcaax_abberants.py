@@ -9,13 +9,13 @@ import scikit_posthocs as sp
 
 #import and edit data
 #imports excel sheet with all the abberant counts
-mbp4dpf_abb = pd.read_excel('/Users/miramota/OHSU Dropbox/Tania Miramontes/Data_sheets/abberant_counts.xlsx', 
+mbp4dpf_abb = pd.read_excel('DataSheets/abberant_counts.xlsx', 
                           sheet_name = '4dpf_combined')
 
 #removes rows with non numeric values in the abberant_count column
 mbp_abb_4dpf = mbp4dpf_abb[pd.to_numeric(mbp4dpf_abb['abberant_count'], errors = 'coerce').notnull()]
 
-mbp5dpf_abb = pd.read_excel('/Users/miramota/OHSU Dropbox/Tania Miramontes/Data_sheets/abberant_counts.xlsx',
+mbp5dpf_abb = pd.read_excel('DataSheets/abberant_counts.xlsx',
                          sheet_name = '5dpf_combined')
 mbp5dpf_long = mbp5dpf_abb.melt(var_name="Drug", value_name="Response")
 
@@ -47,8 +47,41 @@ def test_normality(data, condition, column='abberant_count'):
     print(f"Shapiro-Wilk test results:")
     print(f"Statistic: {statistic:.4f}")
     print(f"P-value: {p_value:.4f}")
-    print(f"\nIf p-value > 0.05: Data is normally distributed")
-    print(f"If p-value < 0.05: Data is not normally distributed")
+    print(f"If p-value > 0.05: Data is normally distributed")
+    print(f"If p-value < 0.05: Data is not normally distributed\n")
+    
+    return statistic, p_value, fig
+
+def test_normality_wide(data):
+    """
+    Perform Shapiro-Wilk test and plot histogram on dataframe that is in a 
+    wide format. Will loop through all columns in the dataframe.
+    
+    Parameters:
+    data: pandas DataFrame
+    column: string, name of column to test
+    """
+    # Loop through all the  columns
+    for column in data.columns:
+        data_col = data[column].dropna()
+
+        # Perform Shapiro-Wilk test
+        statistic, p_value = stats.shapiro(data_col)
+        
+        # Create figure with two subplots
+        fig, (ax1) = plt.subplots(1, figsize=(12, 5))
+    
+        # Histogram with density plot
+        sns.histplot(data=data_col, kde=True,ax=ax1) 
+        ax1.set_title('Distribution of Abberant Count')
+    
+        plt.tight_layout()
+        
+        print(f"Shapiro-Wilk test results for {column}:")
+        print(f"Statistic: {statistic:.4f}")
+        print(f"P-value: {p_value:.4f}")
+        print(f"If p-value > 0.05: Data is normally distributed")
+        print(f"If p-value < 0.05: Data is not normally distributed\n")
     
     return statistic, p_value, fig
 
@@ -59,6 +92,9 @@ stat, p_val, fig = test_normality(mbp_abb_4dpf, 0.5)
 plt.show()
 stat, p_val, fig = test_normality(mbp_abb_4dpf, 1)
 plt.show()
+
+# Test for normality at 5 dpf
+test_normality_wide(mbp5dpf_abb)
 
 #Seperate conditions
 def cond_types(data, condition, column):
@@ -159,5 +195,5 @@ ax2.set_ylim(0,70)
 ax2.spines['top'].set_visible(False)
 ax2.spines['right'].set_visible(False)
 ax2.set_title('5 dpf')
-plt.savefig("/Users/miramota/Desktop/Figures/Figure1/abberrant_count4-5dpf.pdf", format='pdf')
+plt.savefig("Figure_Outputs/abberrant_count4-5dpf.pdf", format='pdf')
 plt.show()
