@@ -3,9 +3,11 @@ import matplotlib.pyplot as plt
 import pandas as pd 
 import numpy as np
 from scipy import stats
+from scipy.stats.contingency import odds_ratio
+import os
 
 # Import data
-nbt_df = pd.read_excel('/Users/miramota/OHSU Dropbox/Tania Miramontes/Data_sheets/combined_nbt_mbpnls_24.xlsx',
+nbt_df = pd.read_excel('DataSheets/combined_nbt_mbpnls_24.xlsx',
                        sheet_name = 'combined')
 # Remove WIN05 condition
 nbt_df_analysis = nbt_df[nbt_df.condition != 'WIN05μM']
@@ -53,7 +55,7 @@ def plot_nbt_mbp_aberrant(df, x_interval = 1, y_interval = 5, figsize = (10, 6))
 
 #Usage
 plot_nbt_mbp_aberrant(df = nbt_timeline)
-plt.savefig("/Users/miramota/Desktop/Figures/nbt_mbpnlscaax/abberant_timeline.pdf", format='pdf')
+plt.savefig("Figure_Outputs/abberant_timeline.pdf", format='pdf')
 plt.show()
 
 # Find average number of aberrant structures in 5 dpf fish
@@ -61,9 +63,22 @@ nbt_5avg= nbt_timeline[nbt_timeline['dpf'] == 5]
 nbt_5avg.groupby('condition')['aberrant'].mean()
 nbt_5avg.groupby('condition')['aberrant'].median()
 
+# Remove fish with 0 aberrant structures
+nbt_5ab = nbt_5avg[nbt_5avg['aberrant'] != 0]
+nbt_sum = nbt_5ab.groupby('condition').sum()
+contingency_table= nbt_sum[['neurons', 'aberrant']]
+
+# Plot neurons over abberant 
+
+sns.swarmplot(data = nbt_5avg, x = 'aberrant', y = 'neurons',
+              hue = 'condition')
 
 
 
+res = odds_ratio(contingency_table[['neurons','aberrant']], kind='conditional')
+odds_ratio_res = res.statistic
+lower_confint, upper_confint = res.confidence_interval(confidence_level=0.95)
 
-
-
+print(f"Odds Ratio   : {odds_ratio_res}")
+print(f"Lower 95% CI : {lower_confint}")
+print(f"Upper 95% CI : {upper_confint}")
