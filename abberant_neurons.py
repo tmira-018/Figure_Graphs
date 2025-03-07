@@ -2,9 +2,10 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd 
 import numpy as np
-from scipy import stats
-from scipy.stats.contingency import odds_ratio
 import os
+import statsmodels.formula.api as smf
+import statsmodels.api as sm
+from scipy.stats import linregress
 
 # Import data
 nbt_df = pd.read_excel('DataSheets/combined_nbt_mbpnls_24.xlsx',
@@ -64,21 +65,58 @@ nbt_5avg.groupby('condition')['aberrant'].mean()
 nbt_5avg.groupby('condition')['aberrant'].median()
 
 # Remove fish with 0 aberrant structures
+nbt_only_ab = nbt_timeline[nbt_timeline['aberrant'] != 0]
 nbt_5ab = nbt_5avg[nbt_5avg['aberrant'] != 0]
-nbt_sum = nbt_5ab.groupby('condition').sum()
-contingency_table= nbt_sum[['neurons', 'aberrant']]
+
+# Find slopes of dmso and win1 neurons over abberant structures
+dslope, dintercept, dr, dpvalue, dse = linregress(dmso_5ab['aberrant'], dmso_5ab['neurons'])
+print(dslope, dintercept, dr, dpvalue, dse)
+
+wslope, wintercept, wr, wpvalue, wse = linregress(win1_5ab['aberrant'], win1_5ab['neurons'])
+print(wslope, wintercept, wr, wpvalue, wse)
+
+# Perform linear regression with interactions
+model = smf.ols('neurons ~ aberrant * condition', data=nbt_5ab).fit()
+# Print results
+print(model.summary())
+
+#ratio model 
+ratio_mdl = smf.ols('ratio ~ dpf * condition', data = nbt_only_ab).fit()
+print(ratio_mdl.summary())
+
 
 # Plot neurons over abberant 
+nbt_5ab['aberrant'] = pd.to_numeric(nbt_5ab['aberrant'])
+nbt_5ab['neurons'] = pd.to_numeric(nbt_5ab['neurons'])
 
-sns.swarmplot(data = nbt_5avg, x = 'aberrant', y = 'neurons',
-              hue = 'condition')
+fig, ax = plt.subplots(figsize = (10, 6))
+sns.scatterplot(data = nbt_5ab, x = 'aberrant', y = 'neurons',
+              hue = 'condition', ax = ax, 
+              palette= ["#1768AC", "#F72585"])
 
+sns.lineplot(x=nbt_5ab['aberrant'], y = dintercept + dslope*nbt_5ab['aberrant'],
+             color = "#1768AC")
 
+sns.lineplot(x = nbt_5ab['aberrant'], y = wintercept + wslope*nbt_5ab['aberrant'],
+             color = "#F72585")
 
-res = odds_ratio(contingency_table[['neurons','aberrant']], kind='conditional')
-odds_ratio_res = res.statistic
-lower_confint, upper_confint = res.confidence_interval(confidence_level=0.95)
+min_x = nbt_5ab['aberrant'].min() * 0.8  # 20% padding on the left
+max_x = nbt_5ab['aberrant'].max() * 1.05  # 5% padding on the right
+ax.set_xlim(min_x, max_x)
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.set_xlabel('Total Number of Aberrant Structures')
+ax.set_ylabel('Number of Neurons EGFP +')
+plt.tight_layout()
+plt.savefig('Figure_Outputs/aberrant_linear.pdf', format = 'pdf')
+plt.show()
 
-print(f"Odds Ratio   : {odds_ratio_res}")
-print(f"Lower 95% CI : {lower_confint}")
-print(f"Upper 95% CI : {upper_confint}")
+# Plotting the ratio of neuron to aberrant structures over time
+nbt_only_ab['ratio'] = nbt_only_ab['neurons'] / nbt_only_ab['aberrant']
+fig, ax = plt.subplots(figsize = (10, 6))
+
+sns.lineplot(data = nbt_only_ab, x = 'dpf', y = 'ratio',
+                hue = 'condition', palette = ["#1768AC", "#F72585"])
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.set_ylim(0, 1)
