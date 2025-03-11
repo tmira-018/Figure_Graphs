@@ -38,7 +38,7 @@ def plot_ind_OL(df,analysis_type, title = 'title',
                 units='cell_ID',
                 estimator=None,
                 hue='cond',
-                palette=["#1768AC", "#420039"],
+                palette=["#1768AC", "#F72585"],
                 legend=False,
                 alpha= 0.8,  # Make individual lines transparent
                 linewidth=.25)  # Thinner lines for individuals
@@ -50,7 +50,8 @@ def plot_ind_OL(df,analysis_type, title = 'title',
                  hue = 'cond',
                  err_style = 'bars',
                  err_kws={'capsize': 5, 'capthick': 2, 'elinewidth': 2},
-                 palette=["#1768AC", "#420039"],
+                 palette=["#1768AC", "#F72585"],
+                 linewidth= 3,
                  errorbar=("se", 1))  
     
     #Customize the plot
@@ -78,12 +79,14 @@ def main():
     parser.add_argument('path', type = str, help= 'The path to the excel file with the combined data of individual OL measurements')
     parser.add_argument('analysis_type', type = str, help= 'OL measurement to plot, number of sheaths, average sheath length, or total myelin output')
     parser.add_argument('title', type = str, help = 'Title of the graph')
+    parser.add_argument('--saving_path', type = str, help= 'The path where the figure will be saved with .pdf extension')
     
     args = parser.parse_args()
 
     path = args.path
     analysis_type = args.analysis_type
     title = args.title
+    saving_path = args.saving_path
 
     if not os.path.isfile(path):
         print(f"Error: the directory '{path}' does not exist")
@@ -107,8 +110,9 @@ def main():
 
     # Usage: plotting OL measurement
     plot_ind_OL(df = ol_analysis2, analysis_type= analysis_type, 
-                    title = title, 
+                    title = title, y_interval= 100,
                     ylabel='N', xlabel='Age')
+    plt.savefig(saving_path, format = 'pdf')
     plt.show()
 
 if __name__ == '__main__':
