@@ -79,7 +79,7 @@ sns.boxplot(data = nls_4dpf,
             fill = False, widths = 0.25, linewidth= 0.75,
             palette= ['black', 'black', 'black'], ax=ax1)
 sns.swarmplot(data = nls_4dpf,
-              palette = ["#1768AC", "#F72585", "#420039"],
+              palette = ["#1768AC", "#420039", "#F72585"],
               legend = False, ax=ax1)
 ax1.spines['top'].set_visible(False)
 ax1.spines['right'].set_visible(False)
@@ -88,7 +88,7 @@ sns.boxplot(data = nls_5dpf,
             fill = False, widths = 0.25, linewidth= 0.75,
             palette = ['black', 'black', 'black'], ax=ax2)
 sns.swarmplot(data = nls_5dpf, 
-              palette = ["#1768AC", "#F72585", "#420039"],
+              palette = ["#1768AC", "#420039", "#F72585"],
               legend = False, ax=ax2)
  
 ax2.spines['top'].set_visible(False)
@@ -97,5 +97,5 @@ ax2.legend(loc = 'upper right')
 ax2.set_title('5 dpf')
 plt.yticks(np.arange(0, 250, 50)) 
 fig.suptitle('Number of OL Nuclei')
-plt.savefig('/Figure_Outputs/mbpnls-45graph.pdf', format='pdf')
+plt.savefig('Figure_Outputs/mbpnls-45graph.pdf', format='pdf')
 plt.show()
