@@ -13,7 +13,7 @@ mbp4dpf_abb = pd.read_excel('DataSheets/abberant_counts.xlsx',
                           sheet_name = '4dpf_combined')
 
 #removes rows with non numeric values in the abberant_count column
-mbp_abb_4dpf = mbp4dpf_abb[pd.to_numeric(mbp4dpf_abb['abberant_count'], errors = 'coerce').notnull()]
+mbp4dpf_abb = mbp4dpf_abb[pd.to_numeric(mbp4dpf_abb['abberant_count'], errors = 'coerce').notnull()]
 
 mbp5dpf_abb = pd.read_excel('DataSheets/abberant_counts.xlsx',
                          sheet_name = '5dpf_combined')
@@ -86,39 +86,51 @@ def test_normality_wide(data):
     return statistic, p_value, fig
 
 # Example usage:
-stat, p_val, fig = test_normality(mbp_abb_4dpf, 'DMSO')
+stat, p_val, fig = test_normality(mbp4dpf_abb, 'DMSO')
 plt.show()
-stat, p_val, fig = test_normality(mbp_abb_4dpf, 0.5)
+stat, p_val, fig = test_normality(mbp4dpf_abb, 0.5)
 plt.show()
-stat, p_val, fig = test_normality(mbp_abb_4dpf, 1)
+stat, p_val, fig = test_normality(mbp4dpf_abb, 1)
 plt.show()
 
 # Test for normality at 5 dpf
 test_normality_wide(mbp5dpf_abb)
 
-#Seperate conditions
+#Seperate conditions and find means and location
 def cond_types(data, condition, column):
+    """
+    Seperate data by condition.
+
+    Returns: 
+    data_condition (pandas DataFrame),
+
+    Parameters:
+    data: pandas DataFrame
+    condition: string or integer of the condition
+    column: string, name of the colum to be seperated
+    """
     data_condition = data[data[column] == condition]
+
     return data_condition
 
-# Seperateing data by condition
-DMSO_4dpf = cond_types(mbp_abb_4dpf, 'DMSO', 'Condition')
-dmso_4_array = DMSO_4dpf['abberant_count'].to_numpy()
-win05_4dpf = cond_types(mbp_abb_4dpf, 0.5, 'Condition')
-win05_4_array = win05_4dpf['abberant_count'].to_numpy()
-win1_4dpf = cond_types(mbp_abb_4dpf, 1, 'Condition')
-win1_4_array = win1_4dpf['abberant_count'].to_numpy()
+# Seperateing data by condition and convert to numpy array
+dmso_4dpf = cond_types(mbp4dpf_abb, 'DMSO', 'Condition')
+dmso_4_array = cond_types(mbp4dpf_abb, 'DMSO', 'Condition')['abberant_count'].to_numpy()
+
+win05_4dpf = cond_types(mbp4dpf_abb, 0.5, 'Condition')
+win05_4_array = cond_types(mbp4dpf_abb, 0.5, 'Condition')['abberant_count'].to_numpy()
+
+win1_4dpf = cond_types(mbp4dpf_abb, 1, 'Condition')
+win1_4_array = cond_types(mbp4dpf_abb, 1, 'Condition')['abberant_count'].to_numpy()
 
 
-#means 
-dmso_mean = DMSO_4dpf['abberant_count'].mean()
-dmso_rep = DMSO_4dpf.loc[DMSO_4dpf['abberant_count'] == 20]
-dmso_rep_value = dmso_rep['abberant_count'].iloc[0]
-win05_mean = win05_4dpf['abberant_count'].mean()
-win05_rep = win05_4dpf.loc[win05_4dpf['abberant_count'] == 19]
-win05_rep_value = win05_rep['abberant_count'].iloc[0]
-win1_mean = win1_4dpf['abberant_count'].mean()
-win1_rep = win1_4dpf.loc[win1_4dpf['abberant_count'] == 25]
+# Medians
+dmso_mean = DMSO_4dpf['abberant_count'].median()
+
+win05_mean = win05_4dpf['abberant_count'].median()
+
+win1_mean = win1_4dpf['abberant_count'].median()
+
 
 dmso_5dpf = mbp5dpf_abb['DMSO'].to_numpy()
 dmso_5dpf = dmso_5dpf[~np.isnan(dmso_5dpf)]
@@ -150,25 +162,15 @@ print(posthoc_results)
 #plot 4 and 5 dpf together 
 
 fig, (ax1, ax2) = plt.subplots(1,2, sharey=True)
-# plot 4 dpf data 
-sns.swarmplot(data = mbp_abb_4dpf, x = 'Condition',
+# Plot 4 dpf data 
+sns.swarmplot(data = mbp4dpf_abb, x = 'Condition',
               y = 'abberant_count', hue = 'Condition',
-              palette = ["#1768AC", "#F72585", "#420039"],
+              palette = ["#1768AC", "#420039", "#F72585"],
               ax= ax1)
-dmso_x_position = 0
-win05_xpos = 1
-win1_xpos = 2
-ax1.scatter(x = [dmso_x_position], y = [dmso_rep_value],
-            color = 'red', s = 75, marker = 'o', zorder = 2)
-ax1.scatter(x = [win05_xpos], y = [win05_rep_value],
-            color = 'black', s = 75, marker = 'o', zorder = 2)
-ax1.scatter(x = [win1_xpos], y = [25],
-            color = 'red', s = 75, marker = 'o', zorder = 2)
 
-
-sns.boxplot(data = mbp_abb_4dpf, x = 'Condition',
+sns.boxplot(data = mbp4dpf_abb, x = 'Condition',
            y = 'abberant_count', hue = 'Condition',
-           fill = False, widths = 0.25,
+           fill = False, widths = 0.5,
            palette= ['black', 'black', 'black'],
            legend=False, linewidth=0.75, ax = ax1)
 ax1.set_ylim(0,70)
@@ -176,21 +178,20 @@ ax1.spines['top'].set_visible(False)
 ax1.spines['right'].set_visible(False)
 ax1.set_title('4 dpf')
 
-#plot 5 dpf data
+# Plot 5 dpf data
 
 sns.swarmplot(data= mbp5dpf_abb,
-              palette = ["#1768AC", "#F72585", "#420039"], ax = ax2)
+              palette = ["#1768AC", "#420039", "#F72585"], ax = ax2)
 
 ax2.scatter(x = [0], y = [dmso_rep5], 
             color = 'red', s = 75, marker = 'o', zorder = 2)
 ax2.scatter(x = [1], y = [win05_rep5],
-            color = 'black', s = 75, marker= 'o', zorder = 2)
+            color = 'red', s = 75, marker= 'o', zorder = 2)
 ax2.scatter(x = [2], y = [win1_rep5],
-            color = 'red', s = 75, marker = 'o', zorder = 2)
+            color = 'black', s = 75, marker = 'o', zorder = 2)
 
-sns.boxplot(data = mbp5dpf_abb, fill = False, widths = 0.25, 
+sns.boxplot(data = mbp5dpf_abb, widths = 0.5, fill = False,  
             palette= ['black', 'black', 'black'], linewidth=0.75, ax = ax2)
-
 ax2.set_ylim(0,70)
 ax2.spines['top'].set_visible(False)
 ax2.spines['right'].set_visible(False)
