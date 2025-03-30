@@ -9,64 +9,43 @@ timeline = pd.read_excel("DataSheets/Timeline_mbpcaaxnls.xlsx",
                          sheet_name = 'Combined')
 
 dpf3 = timeline[timeline['dpf'] == 3]
-treat12 = dpf3[dpf3['treatment'] == '1-2']
-sns.barplot(data = dpf3,
+dpf4 = timeline[timeline['dpf'] == 4]
+
+fig,(ax1,ax2) = plt.subplots(1,2, figsize = (10, 6))
+fig.suptitle('WIN Treatment Timeline')
+sns.boxplot(data = dpf3,
             x = 'treatment', y = 'aberrant',
-            hue = 'cond', 
-            palette = ["#1768AC", "#420039"],
-            errorbar = ('se', 1))
-sns.swarmplot(data = dpf3,
+            hue = 'cond', fill = False, 
+            widths = 0.25, linewidth= 0.75,
+            palette = ['black', 'black'], legend= False, ax= ax1)
+sns.stripplot(data = dpf3,
               x = 'treatment', y = 'aberrant',
               hue = 'cond',
-              palette= ['black', 'black', 'black'],
-              dodge= True, legend= False)
-plt.ylim(0,12)
-plt.savefig('/Users/miramota/Desktop/timeline-3dpf.pdf', format = 'pdf')
+              palette= ["#276FBF", "#7EBC89"],
+              dodge= True, legend= False, ax = ax1)
+ax1.spines['top'].set_visible(False)
+ax1.spines['right'].set_visible(False)
+ax1.set_ylim(-1,14)
+ax1.set_title('3 dpf')
+#plt.savefig('/Users/miramota/Desktop/timeline-3dpf.pdf', format = 'pdf')
 
-dpf4 = timeline[timeline['dpf'] == 4]
-fig, ax = plt.subplots()
 sns.boxplot(data = dpf4,
             x = 'treatment', y = 'aberrant',
             hue = 'cond', fill = False,
             widths = 0.25, linewidth= 0.75,
-            palette = ['black', 'black'], legend= False
+            palette = ['black', 'black'], legend= False, ax = ax2
             )
-sns.swarmplot(data = dpf4,
+sns.stripplot(data = dpf4,
               x = 'treatment', y = 'aberrant',
               hue = 'cond',
               palette= ["#276FBF", "#7EBC89"],
-              dodge= True, legend= True)
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.set_ylim(-1,14)
+              dodge= True, legend= True, ax = ax2)
+ax2.set_title('4 dpf')
+ax2.spines['top'].set_visible(False)
+ax2.spines['right'].set_visible(False)
+ax2.set_ylim(-1,14)
 plt.savefig('Figure_Outputs/timeline-4dpf.pdf', format = 'pdf')
 
-
-fig, (ax1, ax2) = plt.subplots(1, 2)
-fig.suptitle('WIN Treatment Timeline')
-sns.barplot(data = dpf3,
-            x = 'treatment', y = 'aberrant',
-            hue = 'cond', 
-            palette = ["#1768AC", "#420039"], 
-            errorbar = ('se', 1), ax=ax1)
-sns.swarmplot(data = dpf3,
-              x = 'treatment', y = 'aberrant',
-              hue = 'cond',
-              palette= ['black', 'black'],
-              dodge= True, legend= False, ax=ax1)
-ax1.set_ylim(0,14)
-sns.barplot(data = dpf4,
-            x = 'treatment', y = 'aberrant',
-            hue = 'cond', 
-            palette = ["#1768AC", "#420039"],
-            errorbar = ('se', 1), ax=ax2)
-sns.swarmplot(data = dpf4,
-              x = 'treatment', y = 'aberrant',
-              hue = 'cond',
-              palette= ['black', 'black'],
-              dodge= True, legend= False, ax=ax2)
-ax2.set_ylim(0,14)
-plt.savefig('/Users/miramota/Desktop/timeline_graph.pdf', format = 'pdf')
 
 
 mbp_4dpf = pd.read_excel("/Users/miramota/OHSU Dropbox/Tania Miramontes/Data_sheets/WINmbpcaax_4dpf_sumproj_codyscode.xlsx",
