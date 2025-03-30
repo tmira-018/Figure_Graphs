@@ -6,12 +6,13 @@ import os
 import statsmodels.formula.api as smf
 import statsmodels.api as sm
 from scipy.stats import linregress
+from statsmodels.formula.api import ols, mixedlm
 
 # Import data
 nbt_df = pd.read_excel('DataSheets/combined_nbt_mbpnls_24.xlsx',
                        sheet_name = 'combined')
 # Remove WIN05 condition
-nbt_df_analysis = nbt_df[nbt_df.condition != 'WIN05μM']
+nbt_df_analysis = nbt_df[nbt_df.condition != 0.5]
 # Remove fish with only one data point
 nbt_timeline = nbt_df_analysis[nbt_df_analysis.groupby('fish_ID').fish_ID.transform('count')>1]
 
@@ -67,6 +68,8 @@ nbt_5avg.groupby('condition')['aberrant'].median()
 # Remove fish with 0 aberrant structures
 nbt_only_ab = nbt_timeline[nbt_timeline['aberrant'] != 0]
 nbt_5ab = nbt_5avg[nbt_5avg['aberrant'] != 0]
+dmso_5ab = nbt_5ab[nbt_5ab['condition'] == 0.0]
+win1_5ab = nbt_5ab[nbt_5ab['condition'] == 1.0]
 
 # Find slopes of dmso and win1 neurons over abberant structures
 dslope, dintercept, dr, dpvalue, dse = linregress(dmso_5ab['aberrant'], dmso_5ab['neurons'])
@@ -74,6 +77,12 @@ print(dslope, dintercept, dr, dpvalue, dse)
 
 wslope, wintercept, wr, wpvalue, wse = linregress(win1_5ab['aberrant'], win1_5ab['neurons'])
 print(wslope, wintercept, wr, wpvalue, wse)
+
+# Perform linear regression with interactions
+total_ab_model = mixedlm('aberrant ~ dpf * condition', groups = nbt_timeline['fish_ID'], 
+                    data = nbt_timeline).fit()
+# Print results
+print(total_ab_model.summary()) 
 
 # Perform linear regression with interactions
 model = smf.ols('neurons ~ aberrant * condition', data=nbt_5ab).fit()
@@ -108,7 +117,7 @@ ax.spines['right'].set_visible(False)
 ax.set_xlabel('Total Number of Aberrant Structures')
 ax.set_ylabel('Number of Neurons EGFP +')
 plt.tight_layout()
-plt.savefig('Figure_Outputs/aberrant_linear.pdf', format = 'pdf')
+plt.savefig('Figure_Outputs/dmso_aberrant_linear.pdf', format = 'pdf')
 plt.show()
 
 # Plotting the ratio of neuron to aberrant structures over time
