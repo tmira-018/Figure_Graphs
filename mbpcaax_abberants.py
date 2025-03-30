@@ -113,7 +113,7 @@ def cond_types(data, condition, column):
 
     return data_condition
 
-# Seperateing data by condition and convert to numpy array
+# Seperating data by condition and convert to numpy array
 dmso_4dpf = cond_types(mbp4dpf_abb, 'DMSO', 'Condition')
 dmso_4_array = cond_types(mbp4dpf_abb, 'DMSO', 'Condition')['abberant_count'].to_numpy()
 
