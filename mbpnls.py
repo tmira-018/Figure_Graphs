@@ -10,7 +10,7 @@ from scikit_posthocs import posthoc_dunn
 # Import data 
 nls_4dpf = pd.read_excel('DataSheets/WIN_mbp-nls_4dpf.xlsx',
                          sheet_name= 'combined_spinal')
-nls_5dpf = pd.read_excel('DataSheets/WIN_mbp-nls_4dpf.xlsx',
+nls_5dpf = pd.read_excel('DataSheets/WIN_mbp-nls_5dpf.xlsx',
                          sheet_name= 'combined_spinal')
 
 def test_normality_wide(data):
