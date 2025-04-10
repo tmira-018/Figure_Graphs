@@ -60,5 +60,5 @@ ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
 ax.set_title('Number of individual oligodendrocytes with \n'
                 'mbp egfp+ ring across cell age ')
-plt.savefig('/Users/miramota/Desktop/Graphs/Figure_Outputs/ol_ab_time.pdf', format = 'pdf')
+plt.savefig('/Figure_Outputs/ol_ab_time.pdf', format = 'pdf')
 plt.show()
