@@ -1,0 +1,12 @@
+pip==19.2.3
+scikit_posthocs
+scipy
+numpy
+pandas
+matplotlib.pyplot
+seaborn
+argparse
+os
+
+
+
