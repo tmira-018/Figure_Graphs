@@ -2,6 +2,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd 
 import numpy as np
+from scipy import stats
 
 combined_4dpf_caax = pd.read_excel("DataSheets/combined_4dpf_mbpcaax.xlsx",
                          sheet_name = 'combined')
@@ -54,5 +55,18 @@ ax2.scatter(['1% DMSO', '0.5 uM', '1.0 uM'], [11627.546, 12097.077, 11936.248],
             color = 'orange', s = 30,
             edgecolor = 'black', zorder = 10)
 ax2.set_title('Fluorescence Intensity 5 dpf')
-#plt.savefig('Figure_Outputs/4-5dpf_mbpcaax_fluor-int.pdf', format='pdf')
+plt.savefig('Figure_Outputs/4-5dpf_mbpcaax_fluor-int.pdf', format='pdf')
 plt.show()
+
+dose_groups_4dpf = [combined_4dpf_caax[combined_4dpf_caax['DOSE'] == '1% DMSO']['MEAN'],
+               combined_4dpf_caax[combined_4dpf_caax['DOSE'] == '0.5 uM']['MEAN'],
+               combined_4dpf_caax[combined_4dpf_caax['DOSE'] == '1 uM']['MEAN'],]
+
+H_stat, p_value = stats.kruskal(*dose_groups_4dpf)
+print(f"Kruskal-Wallis Test: H = {H_stat}, p = {p_value}")
+
+dose_groups_5dpf = [combined_5dpf_caax[combined_5dpf_caax['DOSE'] == '1% DMSO']['MEAN'],
+                combined_5dpf_caax[combined_5dpf_caax['DOSE'] == '0.5 uM']['MEAN'],
+                combined_5dpf_caax[combined_5dpf_caax['DOSE'] == '1.0 uM']['MEAN']]
+H_stat5, p_value5 = stats.kruskal(*dose_groups_5dpf)
+print(f"Kruskal-Wallis Test: H = {H_stat5}, p = {p_value5}")
