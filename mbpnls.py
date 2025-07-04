@@ -81,6 +81,8 @@ sns.boxplot(data = nls_4dpf,
 sns.swarmplot(data = nls_4dpf,
               palette = ["#1768AC", "#420039", "#F72585"],
               legend = False, ax=ax1)
+ax1.scatter(['DMSO', '0.5 um', '1.0 um'], [126, 121, 119], color= 'orange',
+            edgecolor = 'black', marker = 'o', s = 30, zorder = 10) 
 ax1.spines['top'].set_visible(False)
 ax1.spines['right'].set_visible(False)
 ax1.set_title('4 dpf')
@@ -90,7 +92,8 @@ sns.boxplot(data = nls_5dpf,
 sns.swarmplot(data = nls_5dpf, 
               palette = ["#1768AC", "#420039", "#F72585"],
               legend = False, ax=ax2)
- 
+ax2.scatter(['DMSO', '0.5 um', '1.0 um'], [153, 153, 137], color = 'orange',
+            edgecolor = 'black', marker = 'o', s = 30, zorder = 10 )
 ax2.spines['top'].set_visible(False)
 ax2.spines['right'].set_visible(False)  
 ax2.legend(loc = 'upper right')
