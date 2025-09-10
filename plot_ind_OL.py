@@ -52,7 +52,7 @@ def plot_ind_OL(df,analysis_type, title = 'title',
                  err_kws={'capsize': 5, 'capthick': 2, 'elinewidth': 2},
                  palette=["#1768AC", "#F72585"],
                  linewidth= 3,
-                 errorbar=("se", 1))  
+                 errorbar=("sd"))  
     
     #Customize the plot
     plt.title(title, fontsize=18)
@@ -93,20 +93,20 @@ def main():
         return
     
     #Load data
-    ol_df = pd.read_excel(path)
+    df_path = (path)
+    ol_df = pd.read_excel(df_path)
 
     #shows how many times each cell is repeated, how many days the cell is available
     repeats = ol_df['cell_ID'].value_counts()
+    
     #check how many cells appear only once
     one_times = repeats[repeats == 1].index
+   
     #keeps the cells that appear more than one time shape of ol_analysis plus one_times should equal shape of ol_df
     ol_analysis= ol_df[ol_df['cell_ID'].map(ol_df['cell_ID'].value_counts()) > 1]
+    
     #removes cells that were treated with 0.5 um WIN
     ol_analysis2 = ol_analysis[ol_analysis.cond != 0.5]
-
-    #Make fish id and cell id categorical for statistical analysis if needed
-    fish_ID = ol_analysis["fish_ID"].astype("category")
-    cell_ID = ol_analysis["cell_ID"].astype("category")
 
     # Usage: plotting OL measurement
     plot_ind_OL(df = ol_analysis2, analysis_type= analysis_type, 
@@ -119,5 +119,5 @@ if __name__ == '__main__':
     main()
 
 
-#plt.savefig('/Users/miramota/Desktop/Figures/single_cell_WIN/total_output_means.pdf', format='pdf')
+#plt.savefig('<saving_path>', format='pdf')
 
