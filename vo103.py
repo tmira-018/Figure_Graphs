@@ -9,6 +9,7 @@ from statsmodels.formula.api import ols
 from statsmodels.stats.multitest import multipletests
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
+
 # Plot vo103
 
 # Load the data from the excel file
@@ -22,49 +23,41 @@ mutant_5dpf = mutant_df[mutant_df['dpf']== 5]
 # Exclude the WIN05μM condition
 mutant_5dpf_01 = mutant_5dpf[mutant_5dpf['condition'] != 'WIN05μM']
 mutant_5dpf_01 = mutant_5dpf_01.dropna()
-# Separate data by  
 
+
+def aberrants_vo103(dataframe, analysis_col, 
+                    y_lim = None, saving_path = None):
+    """
+    creates plot across genotypes
+    dataframe = pandas dataframe
+    analysis_col = column name of data to be plotted (y axis)
+    saving_path = path where to save figure"""
 # Plotting aberrant data
-f, ax = plt.subplots()
-sns.swarmplot(data = mutant_5dpf_01, x = 'genotype', y = 'aberrant',
-              hue= 'condition',
-              dodge = True,
-              order=['wt', 'het', 'mut'],
-              #hue_order=['wt', 'het', 'mut'],
-              palette = ["#1768AC", "#F72585"],
-              legend= True)
+    f, ax = plt.subplots()
+    sns.swarmplot(data = dataframe, x = 'genotype', y = analysis_col,
+                hue= 'condition',
+                dodge = True,
+                order=['wt', 'het', 'mut'],
+                #hue_order=['wt', 'het', 'mut'],
+                palette = ["#1768AC", "#F72585"],
+                legend= True)
 
-sns.boxplot(data = mutant_5dpf_01, x = 'genotype',
-           y = 'aberrant', hue = 'condition', 
-           order=['wt', 'het', 'mut'],
-           fill = False, widths = 0.18,
-           palette= ['black', 'black'],
-           legend=False, linewidth=0.75)
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-plt.savefig('Figure_Outputs/vo103_aberrant_genotyped.pdf', format='pdf')
-plt.show()
-
-# Plotting nls counts 
-
-f, ax = plt.subplots()
-sns.swarmplot(data = mutant_5dpf_01,  x = 'genotype', y = 'nls',
-              hue = 'condition',
-              dodge = True,
-              order = ['wt', 'het', 'mut'],
-              palette = ["#1768AC", "#F72585"],
-              legend= True)
-sns.boxplot(data = mutant_5dpf_01, x = 'genotype', y = 'nls',
-            hue= 'condition',
-            order = ['wt', 'het', 'mut'],
+    sns.boxplot(data = dataframe, x = 'genotype',
+            y = analysis_col, hue = 'condition', 
+            order=['wt', 'het', 'mut'],
             fill = False, widths = 0.18,
             palette= ['black', 'black'],
-            legend = False, linewidth=0.75)
-ax.set_ylim(0,50)
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-plt.savefig('Figure_Outputs/vo103_nlscounts.pdf', format = "pdf")
-plt.show()
+            legend=False, linewidth=0.75)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.set_ylim(y_lim)
+    if saving_path is not None:
+        plt.savefig(saving_path, format = "pdf")
+    else:
+        plt.show()
+    plt.tight_layout()
+    return plt.gcf()
+
 
 def test_normality(data, condition, column='aberrant'):
     """
@@ -110,34 +103,10 @@ def cond_types(dataframe, condition, column):
 
 #drop nan values in the aberrant column
 mutant_5dpf_02 = mutant_5dpf_01.dropna(subset=['aberrant'])
-# Do two-way ANOVA
-model = ols( 
-    'aberrant ~ C(genotype) + C(condition) + C(genotype):C(condition)', 
-    data=mutant_5dpf_02).fit() 
-result = sm.stats.anova_lm(model, typ=2) 
-print(result)
 
-
-tukey = pairwise_tukeyhsd(mutant_5dpf_02['aberrant'], 
-                          mutant_5dpf_02['genotype'] + mutant_5dpf_02['condition'])
-print(tukey)
 
 # nls
 mutant_5dpf_nls = mutant_5dpf_01.dropna(subset=['nls'])
-# Do two-way ANOVA
-nls_model = ols( 
-    'nls ~ C(genotype) + C(condition) + C(genotype):C(condition)', 
-    data=mutant_5dpf_nls).fit() 
-result = sm.stats.anova_lm(nls_model, typ=2) 
-print(result)
-
-nls_tukey = pairwise_tukeyhsd(mutant_5dpf_nls['nls'], 
-                          mutant_5dpf_nls['genotype'] + mutant_5dpf_nls['condition'])
-print(nls_tukey)
-
-nls_tukey = sp.posthoc_tukey(mutant_5dpf_nls, val_col= 'nls',
-                             group_col= 'condition')
-print(nls_tukey)
 
 
 def cond_gen_types(data, condition, cond_column, genotype, gen_column):
@@ -150,35 +119,75 @@ def cond_gen_types(data, condition, cond_column, genotype, gen_column):
     Parameters:
     data: pandas DataFrame
     condition: string or integer of the condition
-    column: string, name of the colum to be seperated
+    cond_column: string, name of the colum to be seperated
+    genotype: string of the genotype to be filtered
+    gen_column: string, name of the column with genotype information
     """
     data_condition = data[data[cond_column] == condition]
     gen_df = data_condition[data_condition[gen_column] == genotype]
 
     return gen_df
 
+# Plot aberrant counts and nls counts
+aberrants_vo103(mutant_5dpf_01, 'aberrant', saving_path= 'Figure_Outputs/vo103tests.pdf')
+aberrants_vo103(mutant_5dpf_01, 'nls', 
+                y_lim = (0,60), 
+                saving_path= 'Figure_Outputs/vo103_nlstests.pdf')
 
+# filtering data by condition and genotype
+#DMSO
 dmso_wt = cond_gen_types(mutant_5dpf_nls, 'DMSO', 'condition', 'wt', 'genotype')
 dmso_het = cond_gen_types(mutant_5dpf_nls, 'DMSO', 'condition', 'het', 'genotype')
 dmso_mut = cond_gen_types(mutant_5dpf_nls, 'DMSO', 'condition', 'mut', 'genotype')
+# WIN 1uM
+win_wt = cond_gen_types(mutant_5dpf_nls, 'WIN1μM', 'condition', 'wt', 'genotype')
+win_het = cond_gen_types(mutant_5dpf_nls, 'WIN1μM', 'condition', 'het', 'genotype')
+win_mut = cond_gen_types(mutant_5dpf_nls, 'WIN1μM', 'condition', 'mut', 'genotype')
 
-wt = cond_gen_types(mutant_5dpf_nls, 'wt', 'genotype')
+# run t-test on aberrant counts 
+dmso_wt_abb = dmso_wt['aberrant'].to_numpy()
+win_wt_abb = win_wt['aberrant'].to_numpy()
+t_stat, p_value = stats.ttest_ind(dmso_wt_abb, win_wt_abb)
+print(f"t-statistic: {t_stat}, p-value: {p_value}")
 
-wt_nls_tukey = sp.posthoc_tukey(mutant_5dpf_nls, val_col = 'nls', group_col = 'genotype')
-print(wt_nls_tukey)
+dmso_het_abb = dmso_het['aberrant'].to_numpy()
+win_het_abb = win_het['aberrant'].to_numpy()
+t_stat_het, p_value_het = stats.ttest_ind(dmso_het_abb, win_het_abb)
+print(f't-stat(het): {t_stat_het}, p_value(het): {p_value_het}')
 
-#run t-test
+dmso_mut_abb  = dmso_mut['aberrant'].to_numpy()
+win_mut_abb = win_mut['aberrant'].to_numpy()
+t_stat, p_value = stats.ttest_ind(dmso_mut_abb, win_mut_abb)
+print(f"t-statistic: {t_stat}, p-value: {p_value}")
+
+
+aberrant_model = ols('aberrant ~ C(genotype) * C(condition)', data=mutant_5dpf_01).fit()
+anova_table = sm.stats.anova_lm(aberrant_model, typ=2)  # Type II ANOVA
+print(anova_table)
+
+
+aberrant_tukey = pairwise_tukeyhsd(endog=mutant_5dpf_01['aberrant'],
+                          groups=mutant_5dpf_01['genotype'].astype(str) + "_" + 
+                          mutant_5dpf_01['condition'].astype(str),
+                          alpha=0.05)
+print(aberrant_tukey)
+
+#run t-test on nls counts 
 dmso_wt_nls = dmso_wt['nls'].to_numpy()
 win_wt_nls = win_wt['nls'].to_numpy()
 t_stat, p_value = stats.ttest_ind(dmso_wt_nls, win_wt_nls)
 print(f"t-statistic: {t_stat}, p-value: {p_value}")
+
+dmso_het_nls = dmso_het['nls'].to_numpy()
+win_het_nls = win_het['nls' ].to_numpy()
+t_stat_het, p_value_het = stats.ttest_ind(dmso_het_nls, win_het_nls)
+print(f't-stat(het): {t_stat_het}, p_value(het): {p_value_het}')
 
 dmso_mut_nls  = dmso_mut['nls'].to_numpy()
 win_mut_nls = win_mut['nls'].to_numpy()
 t_stat, p_value = stats.ttest_ind(dmso_mut_nls, win_mut_nls)
 print(f"t-statistic: {t_stat}, p-value: {p_value}")
 
-win_wt = cond_gen_types(mutant_5dpf_nls, 'WIN1μM', 'condition', 'wt', 'genotype')
-win_het = cond_gen_types(mutant_5dpf_nls, 'WIN1μM', 'condition', 'het', 'genotype')
-win_mut = cond_gen_types(mutant_5dpf_nls, 'WIN1μM', 'condition', 'mut', 'genotype')
-
+nls_model = ols('nls ~ C(genotype) * C(condition)', data=mutant_5dpf_01).fit()
+nls_anova_table = sm.stats.anova_lm(nls_model, typ=2)  # Type II ANOVA
+print(nls_anova_table)
