@@ -99,11 +99,8 @@ def cond_types(dataframe, condition, column):
     data_condition = dataframe[dataframe[column] == condition]
     return data_condition
 
-
-
 #drop nan values in the aberrant column
 mutant_5dpf_02 = mutant_5dpf_01.dropna(subset=['aberrant'])
-
 
 # nls
 mutant_5dpf_nls = mutant_5dpf_01.dropna(subset=['nls'])
