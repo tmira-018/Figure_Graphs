@@ -135,6 +135,7 @@ win1_mean = win1_4dpf['abberant_count'].median()
 dmso_5dpf = mbp5dpf_abb['DMSO'].to_numpy()
 dmso_5dpf = dmso_5dpf[~np.isnan(dmso_5dpf)]
 dmso_mean5 = dmso_5dpf.mean()
+dmso_std5 = np.std(dmso_5dpf)
 dmso_rep5 = 15
 
 win05_5dpf = mbp5dpf_abb[0.5].to_numpy()
@@ -145,6 +146,7 @@ win05_rep5 = 23
 win1_5dpf = mbp5dpf_abb[1].to_numpy()
 win1_5dpf = win1_5dpf[~np.isnan(win1_5dpf)]
 win1_mean5 = win1_5dpf.mean()
+win1_std5 = np.std(win1_5dpf)
 win1_rep5 = 32
 
 # Do Kruskal-Wallis test 4 dpf                                           
@@ -166,6 +168,7 @@ fig, (ax1, ax2) = plt.subplots(1,2, sharey=True)
 sns.swarmplot(data = mbp4dpf_abb, x = 'Condition',
               y = 'abberant_count', hue = 'Condition',
               palette = ["#1768AC", "#420039", "#F72585"],
+              size= 5,
               ax= ax1)
 
 sns.boxplot(data = mbp4dpf_abb, x = 'Condition',
@@ -181,7 +184,8 @@ ax1.set_title('4 dpf')
 # Plot 5 dpf data
 
 sns.swarmplot(data= mbp5dpf_abb,
-              palette = ["#1768AC", "#420039", "#F72585"], ax = ax2)
+              palette = ["#1768AC", "#420039", "#F72585"], 
+              size= 6, ax = ax2)
 
 ax2.scatter(x = [0], y = [dmso_rep5], 
             color = 'red', s = 75, marker = 'o', zorder = 2)
@@ -196,5 +200,5 @@ ax2.set_ylim(0,70)
 ax2.spines['top'].set_visible(False)
 ax2.spines['right'].set_visible(False)
 ax2.set_title('5 dpf')
-plt.savefig("Figure_Outputs/abberrant_count4-5dpf.pdf", format='pdf')
+#plt.savefig("Figure_Outputs/abberrant_count4-5dpf.pdf", format='pdf')
 plt.show()
