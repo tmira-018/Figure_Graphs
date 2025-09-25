@@ -7,6 +7,7 @@ import numpy as np
 from scipy import stats
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
 # Load data, this is the dataframe with fish age accounted for only
 path = ('/Users/miramota/Desktop/Graphs/DataSheets/ol_single_cell_oldanalysis.xlsx')
@@ -31,20 +32,23 @@ fishage_df2 = fishage_df.merge(
 )
 
 
-
 def cellage_variance_per_dpf(df, dpf, analysis_type):
     df2 = df[(df['fish_age'] == dpf) &
                       (df['cond'] == 'DMSO')]
+    fig, ax = plt.subplots(figsize = (6, 6))
     ax = sns.boxplot(x = 'cell_age',
                      y = analysis_type,
                      hue = 'cell_age',
                      palette = ['black', 'black', 'black'],
+                     widths = 0.4, linewidth = 0.9,
                      data = df2, fill= False, legend = False)
     ax = sns.swarmplot(x = 'cell_age', 
                        y = analysis_type,
                        data= df2, hue = 'cell_age',
                        hue_order = sorted(df2['cell_age'].unique()),
-                       palette = ['black', 'pink', 'green'])
+                       palette = ['#F68E5F', '#9AE19D', '#8D6B94'], size = 8)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
     plt.ylim(0, df2[analysis_type].max() + 10)
     plt.show()
 
@@ -62,6 +66,8 @@ def cellage_variance_per_dpf(df, dpf, analysis_type):
     else:
         print('error cannot figure out number of groups')
         return None
+    return df2
+    
 
 # Testing at 4 dpf across OL measurements
 cellage_variance_per_dpf(fishage_df2, 4, 'no_sheaths')
@@ -70,8 +76,19 @@ cellage_variance_per_dpf(fishage_df2, 4, 'avg_sheath_len')
 
 
 # Testing at 5 dpf across OL measurements
-cellage_variance_per_dpf(fishage_df2, 5, 'no_sheaths')
-cellage_variance_per_dpf(fishage_df2, 5, 'total_output')
-cellage_variance_per_dpf(fishage_df2, 5, 'avg_sheath_len')
+nosheaths_5dpf = cellage_variance_per_dpf(fishage_df2, 5, 'no_sheaths')
+output_5dpf = cellage_variance_per_dpf(fishage_df2, 5, 'total_output')
+avgsheath_5dpf = cellage_variance_per_dpf(fishage_df2, 5, 'avg_sheath_len')
 
+# Post hoc tests
+output_posthoc = pairwise_tukeyhsd(output_5dpf['total_output'], 
+                                   groups = output_5dpf['cell_age'])
+print(output_posthoc)
+
+avgsheath_posthoc = pairwise_tukeyhsd(avgsheath_5dpf['avg_sheath_len'], 
+                                      groups = avgsheath_5dpf['cell_age'])
+print(avgsheath_posthoc)
+
+
+# Showing distribution between cell ages at 5 dpf between DMSO and WIN
 
