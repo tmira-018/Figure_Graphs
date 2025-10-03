@@ -16,6 +16,24 @@ fishage_df = pd.read_excel(path)
 # Load data, this is the original dataframe with cell age 
 path2 = ('/Users/miramota/Desktop/Graphs/DataSheets/WIN_single_cell.xlsx')
 cellage_df = pd.read_excel(path2)
+cellage_df = cellage_df[cellage_df.cond != 0.5]
+
+# Count how many times each cell_ID appears in the dataframe
+cell_repeats = cellage_df['cell_ID'].value_counts()
+cell_repeats_fa = fishage_df['cell_ID'].value_counts()
+
+
+comparison = (
+    pd.concat([cell_repeats, cell_repeats_fa], axis=1, 
+              keys=['cellage1', 'cellage2'])
+    .fillna(0)
+    .astype(int)
+)
+
+# get only the IDs where counts don't match
+mismatch_ids = comparison[comparison['cellage1'] != comparison['cellage2']].index.tolist()
+
+print(mismatch_ids)
 
 
 # Merge the dataframes to include both cell age and fish age into
@@ -32,9 +50,10 @@ fishage_df2 = fishage_df.merge(
 )
 
 
-def cellage_variance_per_dpf(df, dpf, analysis_type):
+def cellage_variance_per_dpf(df, dpf, analysis_type, savepath = None):
     df2 = df[(df['fish_age'] == dpf) &
                       (df['cond'] == 'DMSO')]
+    df2.dropna(subset=[analysis_type], inplace = True)
     fig, ax = plt.subplots(figsize = (6, 6))
     ax = sns.boxplot(x = 'cell_age',
                      y = analysis_type,
@@ -46,11 +65,14 @@ def cellage_variance_per_dpf(df, dpf, analysis_type):
                        y = analysis_type,
                        data= df2, hue = 'cell_age',
                        hue_order = sorted(df2['cell_age'].unique()),
-                       palette = ['#F68E5F', '#9AE19D', '#8D6B94'], size = 8)
+                       palette = ['#b7adcf', '#429ea6', '#ff6b35'], size = 8)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     plt.ylim(0, df2[analysis_type].max() + 10)
-    plt.show()
+    if savepath is not None:
+        plt.savefig(f'{savepath}.pdf', format = 'pdf')
+    else:
+        plt.show()
 
     if len(df2['cell_age'].unique()) == 2:
         group1 = df2[df2['cell_age'] == df2['cell_age'].unique()[0]][analysis_type]
@@ -85,10 +107,33 @@ output_posthoc = pairwise_tukeyhsd(output_5dpf['total_output'],
                                    groups = output_5dpf['cell_age'])
 print(output_posthoc)
 
-avgsheath_posthoc = pairwise_tukeyhsd(avgsheath_5dpf['avg_sheath_len'], 
+avgsheath_posthoc = pairwise_tukeyhsd(avgsheath_5dpf['avg_sheath_len'].dropna(), 
                                       groups = avgsheath_5dpf['cell_age'])
 print(avgsheath_posthoc)
 
 
 # Showing distribution between cell ages at 5 dpf between DMSO and WIN
+def cellage_distribution(df, dpf, savepath = None):
+    dmso_df = df[(df['fish_age'] == dpf) &
+                 (df['cond'] == 'DMSO')]
+    win_df = df[(df['fish_age'] == dpf) &
+                (df['cond'] == 'WIN1')]
 
+    fig, (ax1, ax2) = plt.subplots(1,2, figsize = (8, 6))
+    
+    ax1.pie(dmso_df['cell_age'].value_counts(),
+            labels = dmso_df['cell_age'].value_counts().index,
+            autopct = lambda p: f'{int(round(p * sum(dmso_df['cell_age'].value_counts()) / 100.0))}',
+            colors = ['#ee964b', '#429ea6', '#b7adcf'])
+    ax2.pie(win_df['cell_age'].value_counts(),
+            labels = win_df['cell_age'].value_counts().index,
+            autopct = lambda p: f'{int(round(p * sum(win_df['cell_age'].value_counts()) / 100.0))}',
+            colors = ['#ee964b', '#b7adcf', '#429ea6'])
+    ax1.set_title('Distribution of cell ages DMSO')
+    ax2.set_title('Distribution of cell ages WIN 55')
+    if savepath is not None:
+        plt.savefig(f'{savepath}.pdf', format = 'pdf')
+    else:
+        plt.show()
+
+cellage_distribution(fishage_df2, 5, 'Figure_outputs/cellage_distribution_5dpf')
