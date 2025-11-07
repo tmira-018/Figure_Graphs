@@ -10,11 +10,11 @@ from statsmodels.formula.api import ols
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
 # Load data, this is the dataframe with fish age accounted for only
-path = ('/Users/miramota/Desktop/Graphs/DataSheets/ol_single_cell_oldanalysis.xlsx')
+path = ('DataSheets/ol_single_cell_oldanalysis.xlsx')
 fishage_df = pd.read_excel(path)
 
 # Load data, this is the original dataframe with cell age 
-path2 = ('/Users/miramota/Desktop/Graphs/DataSheets/WIN_single_cell.xlsx')
+path2 = ('DataSheets/WIN_single_cell.xlsx')
 cellage_df = pd.read_excel(path2)
 cellage_df = cellage_df[cellage_df.cond != 0.5]
 
@@ -103,13 +103,13 @@ output_5dpf = cellage_variance_per_dpf(fishage_df2, 5, 'total_output')
 avgsheath_5dpf = cellage_variance_per_dpf(fishage_df2, 5, 'avg_sheath_len')
 
 # Post hoc tests
-output_posthoc = pairwise_tukeyhsd(output_5dpf['total_output'], 
-                                   groups = output_5dpf['cell_age'])
-print(output_posthoc)
+#output_posthoc = pairwise_tukeyhsd(output_5dpf['total_output'], 
+#                                   groups = output_5dpf['cell_age'])
+#print(output_posthoc)
 
-avgsheath_posthoc = pairwise_tukeyhsd(avgsheath_5dpf['avg_sheath_len'].dropna(), 
-                                      groups = avgsheath_5dpf['cell_age'])
-print(avgsheath_posthoc)
+#avgsheath_posthoc = pairwise_tukeyhsd(avgsheath_5dpf['avg_sheath_len'].dropna(), 
+#                                      groups = avgsheath_5dpf['cell_age'])
+#print(avgsheath_posthoc)
 
 
 # Showing distribution between cell ages at 5 dpf between DMSO and WIN
@@ -136,4 +136,46 @@ def cellage_distribution(df, dpf, savepath = None):
     else:
         plt.show()
 
-cellage_distribution(fishage_df2, 5, 'Figure_outputs/cellage_distribution_5dpf')
+#cellage_distribution(fishage_df2, 5, 'Figure_outputs/cellage_distribution_5dpf')
+
+def plot_by_fishage(df, OL_analysis, condition, savepath= None):
+    df_analysis = df[df['cond'] == condition].dropna(subset =[OL_analysis])
+    if len(df_analysis['fish_age'].unique()) > 2:
+        print(f'More than 2 fish ages, running one way ANOVA {OL_analysis}')
+        model = ols(f'{OL_analysis} ~ C(fish_age)', data = df_analysis).fit()
+        anova_table = sm.stats.anova_lm(model, typ = 2)
+        anova_pval = anova_table['PR(>F)'].iloc[0]
+        print(anova_table, anova_pval)
+
+        if anova_pval < 0.05:
+            posthoc = pairwise_tukeyhsd(df_analysis[OL_analysis], 
+                                        groups = df_analysis['fish_age'])
+            print(f'Posthoc results from {OL_analysis}: {posthoc}')
+
+        else: 
+            print(f'No significance from ANOVA for {OL_analysis}')
+
+    fig, ax = plt.subplots(figsize = (8,6))
+    ax = sns.boxplot(x = 'fish_age', y = OL_analysis,
+                    hue = 'fish_age', fill= False,
+                    palette = ['black', 'black','black','black'],
+                    width = 0.7,
+                    data = df[df['cond'] == condition], legend = False)
+    ax = sns.stripplot(x = 'fish_age', y = OL_analysis,
+                    hue = 'cell_age',
+                    data = df[df['cond'] == condition],
+                    size = 8,
+                    palette = ['#b7adcf', '#429ea6','#ee964b', '#DA3E52']
+                    )
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    plt.ylim(0, df[OL_analysis].max() + 10)
+    if savepath is not None:
+        plt.savefig(f'{savepath}.pdf', format = 'pdf')
+    else:
+        plt.show()
+
+plot_by_fishage(fishage_df2, 'no_sheaths', 'DMSO')
+plot_by_fishage(fishage_df2, 'total_output', 'DMSO')
+plot_by_fishage(fishage_df2, 'avg_sheath_len', 'DMSO')
+
