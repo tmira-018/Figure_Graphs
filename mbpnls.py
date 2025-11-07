@@ -101,10 +101,10 @@ print(f"5 dpf t-test: t = {t_stat_5dpf}, pvalue = {p_value_5dpf}")
 
 # Plot mbpnls
 
-fig, ax = plt.subplots(figsize=(5, 6))
+fig, ax = plt.subplots(figsize=(4, 6))
 ax  = sns.boxplot(data = nls_5dpf_filtered,
            fill= False,
-           palette = ['black', 'black'], widths = 0.3,
+           palette = ['black', 'black'], widths = 0.4,
            linewidth = 0.9, legend= False)
 ax = sns.swarmplot(data = nls_5dpf_filtered,
                  s = 10,
@@ -116,5 +116,5 @@ ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
 plt.yticks(np.arange(0, 225, 25))
 fig.suptitle('Number of OL Nuclei 5 dpf')
-plt.savefig('Figure_Outputs/mbpnls_5dpf.pdf', format = 'pdf')
+plt.savefig('Figure_Outputs/mbpnls_5dpf_4x6.pdf', format = 'pdf')
 plt.show()
