@@ -2,6 +2,11 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd 
 import numpy as np
+from statsmodels.formula.api import ols
+from statsmodels.stats.anova import anova_lm
+import scipy.stats as stats
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
+import scikit_posthocs as sp
 
 # Plot timeline
 
@@ -13,12 +18,12 @@ dpf4 = timeline[timeline['dpf'] == 4]
 
 fig,(ax1,ax2) = plt.subplots(1,2, figsize = (10, 6))
 fig.suptitle('WIN Treatment Timeline')
-sns.boxplot(data = dpf3,
+sns.boxplot(data = timeline,
             x = 'treatment', y = 'aberrant',
             hue = 'cond', fill = False, 
             widths = 0.25, linewidth= 0.75,
             palette = ['black', 'black'], legend= False, ax= ax1)
-sns.stripplot(data = dpf3,
+sns.stripplot(data = timeline,
               x = 'treatment', y = 'aberrant',
               hue = 'cond',
               palette= ["#276FBF", "#7EBC89"],
@@ -29,22 +34,23 @@ ax1.set_ylim(-1,14)
 ax1.set_title('3 dpf')
 #plt.savefig('/Users/miramota/Desktop/timeline-3dpf.pdf', format = 'pdf')
 
+fig,ax= plt.subplots(figsize = (10, 6))
 sns.boxplot(data = dpf4,
             x = 'treatment', y = 'aberrant',
             hue = 'cond', fill = False,
             widths = 0.25, linewidth= 0.75,
-            palette = ['black', 'black'], legend= False, ax = ax2
+            palette = ['black', 'black'], legend= False
             )
-sns.stripplot(data = dpf4,
+sns.swarmplot(data = dpf4,
               x = 'treatment', y = 'aberrant',
               hue = 'cond',
-              palette= ["#276FBF", "#7EBC89"],
-              dodge= True, legend= True, ax = ax2)
-ax2.set_title('4 dpf')
-ax2.spines['top'].set_visible(False)
-ax2.spines['right'].set_visible(False)
-ax2.set_ylim(-1,14)
-plt.savefig('Figure_Outputs/timeline-4dpf.pdf', format = 'pdf')
+              palette= ["#1768AC", "#F72585"],
+              dodge= True, legend= True)
+ax.set_title('4 dpf')
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.set_ylim(-1,14)
+plt.savefig('Figure_Outputs/timeline-4dpf-dayformat.pdf', format = 'pdf')
 
 
 
@@ -87,3 +93,36 @@ print(timeline_test)
 
 posthoc_results = sp.posthoc_dunn(aberrant_23, val_col="aberrant", group_col="cond", p_adjust="sidak")
 print(posthoc_results)
+
+
+
+timeline_model = ols('aberrant ~ C(treatment) * C(cond)', data=dpf4).fit()
+timeline_anova_table = sm.stats.anova_lm(timeline_model, typ=2)  # Type II ANOVA
+print(timeline_anova_table)
+
+# Check effect sizes (Partial Eta Squared)
+def calculate_partial_eta_squared(anova_table):
+    anova_table['partial_eta_sq'] = anova_table['sum_sq'] / (anova_table['sum_sq'] + anova_table['sum_sq'].sum())
+    return anova_table
+
+anova_with_effect = calculate_partial_eta_squared(timeline_anova)
+print("\nANOVA with Effect Sizes:")
+print(anova_with_effect)
+
+
+timeline_tukey = pairwise_tukeyhsd(timeline['aberrant'], 
+                          timeline['treatment'] + timeline['cond'])
+print(timeline_tukey)
+
+summary = timeline.groupby(['treatment', 'cond', 
+                      'dpf'])['aberrant'].agg(['mean', 'var']).reset_index()
+
+summary['overdispersion'] = summary['var'] / summary['mean']
+
+timeline_model = smf.glm('aberrant ~ C(treatment) * C(cond)', 
+                         data = dpf3).fit()
+print(timeline_model.summary())
+
+timeline_model4 = smf.glm('aberrant ~ C(treatment) * C(cond)', 
+                         data = dpf4).fit()
+print(timeline_model4.summary())
