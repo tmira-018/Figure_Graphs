@@ -125,7 +125,7 @@ win1_4_array = cond_types(mbp4dpf_abb, 1, 'Condition')['abberant_count'].to_nump
 
 
 # Medians
-dmso_mean = DMSO_4dpf['abberant_count'].median()
+dmso_mean = dmso_4dpf['abberant_count'].median()
 
 win05_mean = win05_4dpf['abberant_count'].median()
 
@@ -162,43 +162,47 @@ print(posthoc_results)
 
 
 #plot 4 and 5 dpf together 
+def aberrant_caax (dpf4_dataframe, dpf5_dataframe,
+                saving_path = None):
+    fig, (ax1, ax2) = plt.subplots(1,2, sharey=True)
+    # Plot 4 dpf data 
+    sns.swarmplot(data = dpf4_dataframe, x = 'Condition',
+                y = 'abberant_count', hue = 'Condition',
+                palette = ["#1768AC", "#420039", "#F72585"],
+                size= 5,
+                ax= ax1)
 
-fig, (ax1, ax2) = plt.subplots(1,2, sharey=True)
-# Plot 4 dpf data 
-sns.swarmplot(data = mbp4dpf_abb, x = 'Condition',
-              y = 'abberant_count', hue = 'Condition',
-              palette = ["#1768AC", "#420039", "#F72585"],
-              size= 5,
-              ax= ax1)
+    sns.boxplot(data = dpf4_dataframe, x = 'Condition',
+            y = 'abberant_count', hue = 'Condition',
+            fill = False, widths = 0.5,
+            palette= ['black', 'black', 'black'],
+            legend=False, linewidth=0.75, ax = ax1)
+    ax1.set_ylim(0,70)
+    ax1.spines['top'].set_visible(False)
+    ax1.spines['right'].set_visible(False)
+    ax1.set_title('4 dpf')
 
-sns.boxplot(data = mbp4dpf_abb, x = 'Condition',
-           y = 'abberant_count', hue = 'Condition',
-           fill = False, widths = 0.5,
-           palette= ['black', 'black', 'black'],
-           legend=False, linewidth=0.75, ax = ax1)
-ax1.set_ylim(0,70)
-ax1.spines['top'].set_visible(False)
-ax1.spines['right'].set_visible(False)
-ax1.set_title('4 dpf')
+    # Plot 5 dpf data
+    sns.boxplot(data = dpf5_dataframe, widths = 0.5, fill = False,  
+                palette= ['black', 'black', 'black'], linewidth=0.75, ax = ax2)
+    
+    sns.swarmplot(data= dpf5_dataframe,
+                palette = ["#1768AC", "#420039", "#F72585"], 
+                size= 6, ax = ax2)
+    ax2.scatter(x = [0], y = [dmso_rep5], 
+                color = 'red', s = 75, marker = 'o', zorder = 2)
+    ax2.scatter(x = [1], y = [win05_rep5],
+                color = 'red', s = 75, marker= 'o', zorder = 2)
+    ax2.scatter(x = [2], y = [win1_rep5],
+                color = 'black', s = 75, marker = 'o', zorder = 2)
+    ax2.set_ylim(0,70)
+    ax2.spines['top'].set_visible(False)
+    ax2.spines['right'].set_visible(False)
+    ax2.set_title('5 dpf')
+    if saving_path is not None:
+        plt.savefig(saving_path, format = 'pdf')
+    else:
+        plt.show()
+    return plt.gcf()
 
-# Plot 5 dpf data
-
-sns.swarmplot(data= mbp5dpf_abb,
-              palette = ["#1768AC", "#420039", "#F72585"], 
-              size= 6, ax = ax2)
-
-ax2.scatter(x = [0], y = [dmso_rep5], 
-            color = 'red', s = 75, marker = 'o', zorder = 2)
-ax2.scatter(x = [1], y = [win05_rep5],
-            color = 'red', s = 75, marker= 'o', zorder = 2)
-ax2.scatter(x = [2], y = [win1_rep5],
-            color = 'black', s = 75, marker = 'o', zorder = 2)
-
-sns.boxplot(data = mbp5dpf_abb, widths = 0.5, fill = False,  
-            palette= ['black', 'black', 'black'], linewidth=0.75, ax = ax2)
-ax2.set_ylim(0,70)
-ax2.spines['top'].set_visible(False)
-ax2.spines['right'].set_visible(False)
-ax2.set_title('5 dpf')
-#plt.savefig("Figure_Outputs/abberrant_count4-5dpf.pdf", format='pdf')
-plt.show()
+aberrant_caax(mbp4dpf_abb, mbp5dpf_abb)
