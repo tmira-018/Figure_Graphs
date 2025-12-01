@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-path = ('/Users/miramota/Desktop/Graphs/DataSheets/WIN_single_cell.xlsx')
+path = ('Graphs/DataSheets/WIN_single_cell.xlsx')
 ol_df = pd.read_excel(path)
 
 ol_analysis= ol_df[ol_df['cell_ID'].map(ol_df['cell_ID'].value_counts()) > 1]
@@ -51,16 +51,21 @@ ax2.set_title('WIN Treated Cells with aberrant process')
 ax2.set_ylabel('Cell ID')
 ax2.set_xlabel('Cell Age (days)')
 plt.tight_layout()
-plt.savefig('/Users/miramota/Desktop/Graphs/single_ol_aberrant_heatmap.pdf', 
-            format = 'pdf')
+#plt.savefig('Graphs/single_ol_aberrant_heatmap.pdf', 
+ #           format = 'pdf')
 plt.show()
 
+
+# Summary data for histogram 
+# Grouping by cell age and condition
 ol_3days_summary = (
     ol_3analysis
     .groupby(['cell_age', 'cond']).agg(
                   total_cells= ('cell_ID', 'count'),
                   aberrant_cells = ('aberrant_bool', 'sum')).reset_index()
 )
+
+# Creating new column to calculate the number of normal cells 
 ol_3days_summary['normal'] = ol_3days_summary['total_cells'] - ol_3days_summary['aberrant_cells']
 
 
@@ -109,7 +114,7 @@ ax.spines['right'].set_visible(False)
 # Add condition labels or title
 ax.set_xlabel('Cell Age per Condition')
 plt.tight_layout()
-plt.savefig('/Users/miramota/Desktop/Graphs/aberrant_ol_histogram.pdf',
-            format = 'pdf')
+#plt.savefig('Graphs/aberrant_ol_histogram.pdf',
+        #    format = 'pdf')
 plt.show()
 
