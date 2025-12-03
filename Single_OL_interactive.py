@@ -37,13 +37,13 @@ app.layout = html.Div([
     html.Br(),
     html.Div([
         dcc.Graph(id = 'avg_sheath_graph', figure={},
-              style = {'width': '80%', 'display':'inline-block', 'padding': '0 10'}),
+              style = {'width': '80%', 'margin': '0 auto', 'padding': '0 10'}),
         
         dcc.Graph(id = 'no_sheaths_graph', figure={},
-                  style = {'width': '80%', 'display': 'inline-block', 'padding': '0 10'}),
+                  style = {'width': '80%', 'margin': '0 auto', 'padding': '0 10'}),
         
         dcc.Graph(id = 'total_output_graph', figure={},
-                  style = {'width': '80%', 'display':'inline-block', 'padding': '0 10'})
+                  style = {'width': '80%', 'margin': '0 auto', 'padding': '0 10'})
     ])
 ])
 
@@ -54,8 +54,7 @@ app.layout = html.Div([
      Output(component_id = 'avg_sheath_graph', component_property = 'figure'),
      Output(component_id = 'no_sheaths_graph', component_property = 'figure'),
      Output(component_id = 'total_output_graph', component_property = 'figure')],
-     [Input(component_id = 'select_cond', component_property = 'value')]
-)
+     [Input(component_id = 'select_cond', component_property = 'value')])
 
 def update_graph(option_selected):
     print(option_selected)
