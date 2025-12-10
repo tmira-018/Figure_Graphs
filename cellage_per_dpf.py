@@ -136,7 +136,7 @@ def cellage_distribution(df, dpf, savepath = None):
     else:
         plt.show()
 
-#cellage_distribution(fishage_df2, 5, 'Figure_outputs/cellage_distribution_5dpf')
+cellage_distribution(fishage_df2, 5)
 
 def plot_by_fishage(df, OL_analysis, condition, savepath= None):
     df_analysis = df[df['cond'] == condition].dropna(subset =[OL_analysis])
