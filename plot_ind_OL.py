@@ -108,9 +108,17 @@ def main():
     #removes cells that were treated with 0.5 um WIN
     ol_analysis2 = ol_analysis[ol_analysis.cond != 0.5]
 
+    #Print n values 
+    dmso_n = ol_analysis2[ol_analysis2['cond'] ==0]
+    print(f'DMSO cells n= {len(dmso_n['cell_ID'].unique())}')
+    print(f' DMSO fish n = {len(dmso_n['fish_ID'].unique())}')
+    win_n = ol_analysis2[ol_analysis2['cond'] ==1]
+    print(f'WIN cells n= {len(win_n['cell_ID'].unique())}')
+    print(f' WIN fish n = {len(win_n['fish_ID'].unique())}')
+
     # Usage: plotting OL measurement
     plot_ind_OL(df = ol_analysis2, analysis_type= analysis_type, 
-                    title = title, y_interval= 100,
+                    title = title, y_interval= 100, # change y interval to 10 for number of sheaths and avg sheath length 100 for total myelin output
                     ylabel='N', xlabel='Age')
     plt.savefig(saving_path, format = 'pdf')
     plt.show()
@@ -118,6 +126,4 @@ def main():
 if __name__ == '__main__':
     main()
 
-
-#plt.savefig('<saving_path>', format='pdf')
 
