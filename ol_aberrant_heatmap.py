@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-path = ('Graphs/DataSheets/WIN_single_cell.xlsx')
+path = ('/Graphs/DataSheets/WIN_single_cell.xlsx')
 ol_df = pd.read_excel(path)
 
 ol_analysis= ol_df[ol_df['cell_ID'].map(ol_df['cell_ID'].value_counts()) > 1]
@@ -31,7 +31,7 @@ win_pivot = win_ol_analysis.pivot_table(index='cell_ID',
                                         columns = 'cell_age',
                                         values = 'aberrant')
 
-dmso_cmap_dict = {0: "#def4f8c9", 1: "#1768AC"}
+dmso_cmap_dict = {0: "#daebff", 1: "#8fa0da", 2: '#44558f', 3: '#000a44'}
 dmso_cmap = ListedColormap([dmso_cmap_dict[i] for i in range(len(dmso_cmap_dict))])
 
 win_cmap_dict = {0: "#F6E0E9BB", 1: "#F5A4C9", 2: '#F72585', 3: "#900946"}
@@ -39,6 +39,7 @@ win_cmap = ListedColormap([win_cmap_dict[i] for i in range(len(win_cmap_dict))])
 
 fig,(ax1, ax2) = plt.subplots(1, 2, figsize = (12,6))
 sns.heatmap(dmso_pivot, annot= False, cmap = dmso_cmap, cbar= True, 
+            vmin = 0, vmax = 3,
             linewidths= 0.5, ax=ax1)
 ax1.set_title('DMSO Treated Cells with aberrant process')
 ax1.set_ylabel('Cell ID')
@@ -51,8 +52,8 @@ ax2.set_title('WIN Treated Cells with aberrant process')
 ax2.set_ylabel('Cell ID')
 ax2.set_xlabel('Cell Age (days)')
 plt.tight_layout()
-#plt.savefig('Graphs/single_ol_aberrant_heatmap.pdf', 
- #           format = 'pdf')
+plt.savefig('/Graphs/single_ol_aberrant_heatmap.pdf', 
+            format = 'pdf')
 plt.show()
 
 
@@ -114,7 +115,7 @@ ax.spines['right'].set_visible(False)
 # Add condition labels or title
 ax.set_xlabel('Cell Age per Condition')
 plt.tight_layout()
-#plt.savefig('Graphs/aberrant_ol_histogram.pdf',
-        #    format = 'pdf')
+plt.savefig('/Graphs/aberrant_ol_histogram.pdf',
+            format = 'pdf')
 plt.show()
 
