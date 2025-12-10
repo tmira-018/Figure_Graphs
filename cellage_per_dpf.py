@@ -10,11 +10,11 @@ from statsmodels.formula.api import ols
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
 # Load data, this is the dataframe with fish age accounted for only
-path = ('DataSheets/ol_single_cell_oldanalysis.xlsx')
+path = ('/DataSheets/ol_single_cell_oldanalysis.xlsx')
 fishage_df = pd.read_excel(path)
 
 # Load data, this is the original dataframe with cell age 
-path2 = ('DataSheets/WIN_single_cell.xlsx')
+path2 = ('/DataSheets/WIN_single_cell.xlsx')
 cellage_df = pd.read_excel(path2)
 cellage_df = cellage_df[cellage_df.cond != 0.5]
 
