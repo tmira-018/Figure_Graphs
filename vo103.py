@@ -13,7 +13,7 @@ from statsmodels.stats.multicomp import pairwise_tukeyhsd
 # Plot vo103
 
 # Load the data from the excel file
-mutant_df = pd.read_excel("DataSheets/vo103_mbpnlscaax_24.xlsx",
+mutant_df = pd.read_excel("/Graphs/DataSheets/vo103_mbpnlscaax_24.xlsx",
                        sheet_name = 'combined')
  
 # Edit the dataframe to include only 5dpf data
@@ -38,7 +38,6 @@ def aberrants_vo103(dataframe, analysis_col,
                 hue= 'condition',
                 dodge = True,
                 order=['wt', 'het', 'mut'],
-                #hue_order=['wt', 'het', 'mut'],
                 palette = ["#1768AC", "#F72585"],
                 legend= True)
 
@@ -126,10 +125,12 @@ def cond_gen_types(data, condition, cond_column, genotype, gen_column):
     return gen_df
 
 # Plot aberrant counts and nls counts
-aberrants_vo103(mutant_5dpf_01, 'aberrant', saving_path= 'Figure_Outputs/vo103tests.pdf')
+aberrants_vo103(mutant_5dpf_01, 'aberrant', saving_path= 'Figure_Outputs/vo103tests.pdf'
+                )
 aberrants_vo103(mutant_5dpf_01, 'nls', 
-                y_lim = (0,60), 
-                saving_path= 'Figure_Outputs/vo103_nlstests.pdf')
+                y_lim = (0,60) 
+                saving_path= 'Figure_Outputs/vo103_nlstests.pdf'
+)
 
 # filtering data by condition and genotype
 #DMSO
