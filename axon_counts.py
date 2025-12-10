@@ -7,7 +7,7 @@ from scipy import stats
 from scikit_posthocs import posthoc_dunn
 
 # Import EM data 
-em_df = pd.read_excel("/Users/miramota/OHSU Dropbox/Tania Miramontes/Data_sheets/EM_axoncounts.xlsx", 
+em_df = pd.read_excel("/Graphs/Data_sheets/EM_axoncounts.xlsx", 
                     sheet_name = "combined")
 
 ventral_dmso = em_df[em_df['cond'] == 0]['ventral'].dropna()
