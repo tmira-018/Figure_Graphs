@@ -7,12 +7,12 @@ from scipy import stats
 
 
 # Import data 
-nls_4dpf = pd.read_excel('DataSheets/WIN_mbp-nls_4dpf.xlsx',
+nls_4dpf = pd.read_excel('/Graphs/DataSheets/WIN_mbp-nls_4dpf.xlsx',
                          sheet_name= 'combined_spinal')
 #drop 0.5 um 
 nls_4dpf_filtered = nls_4dpf.drop(columns=['0.5 um'])
 
-nls_5dpf = pd.read_excel('DataSheets/WIN_mbp-nls_5dpf.xlsx',
+nls_5dpf = pd.read_excel('/Graphs/DataSheets/WIN_mbp-nls_5dpf.xlsx',
                          sheet_name= 'combined_spinal')
 nls_5dpf_filtered = nls_5dpf.drop(columns = ['0.5 um'])
 
@@ -57,8 +57,8 @@ def test_normality_wide(data):
 #test_normality_wide(nls_5dpf)
 
 
-# Plot mbpnls
-'''fig, (ax1,ax2) = plt.subplots(1,2, sharey=True, figsize = (6.5,6))
+# Plot mbpnls for 4 and 5 dpf side by side 
+fig, (ax1,ax2) = plt.subplots(1,2, sharey=True, figsize = (6.5,6))
 sns.boxplot(data = nls_4dpf_filtered,
             fill = False, widths = 0.3, linewidth= 0.9,
             palette= ['black', 'black'], ax=ax1)
@@ -85,7 +85,7 @@ ax2.set_title('5 dpf')
 plt.yticks(np.arange(0, 250, 50)) 
 fig.suptitle('Number of OL Nuclei')
 #plt.savefig('Figure_Outputs/mbpnls-45graph_v2.pdf', format='pdf')
-plt.show()'''
+plt.show()
 
 # Perform t test for nls data DMSO and WIN 1.0 um
 t_stat_4dpf, p_value_4dpf = stats.ttest_ind(nls_4dpf_filtered['DMSO'].dropna(), 
@@ -99,8 +99,8 @@ t_stat_5dpf, p_value_5dpf = stats.ttest_ind(nls_5dpf_filtered['DMSO'].dropna(),
 print(f"5 dpf t-test: t = {t_stat_5dpf}, pvalue = {p_value_5dpf}")
 
 
-# Plot mbpnls
-
+# Plot mbpnls just at 5 dpf in a 4x6 figure
+# This was used for the manuscript figure
 fig, ax = plt.subplots(figsize=(4, 6))
 ax  = sns.boxplot(data = nls_5dpf_filtered,
            fill= False,
@@ -116,5 +116,5 @@ ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
 plt.yticks(np.arange(0, 225, 25))
 fig.suptitle('Number of OL Nuclei 5 dpf')
-plt.savefig('Figure_Outputs/mbpnls_5dpf_4x6.pdf', format = 'pdf')
+#plt.savefig('Figure_Outputs/mbpnls_5dpf_4x6.pdf', format = 'pdf')
 plt.show()
