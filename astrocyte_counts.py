@@ -42,7 +42,7 @@ ax2.spines['top'].set_visible(False)
 ax1.set_title("4dpf")
 ax2.set_title("5dpf")
 ax1.set_ylabel("aberrant counts")
-#plt.savefig("/Users/miramota/Desktop/Graphs/Figure_Outputs/astrocyte_counts.pdf", format= 'pdf')
+#plt.savefig("/Graphs/Figure_Outputs/astrocyte_counts.pdf", format= 'pdf')
 plt.show()
 
 # make numpy array for stats
